@@ -1,46 +1,37 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Payment } from '../entities/payment.entity';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
-export class SeederService {
+export class SeederService implements OnModuleInit {
   constructor(
     @InjectRepository(Payment)
     private readonly paymentRepository: Repository<Payment>,
   ) {}
+
+  async onModuleInit() {
+    await this.seed();
+  }
 
   async seed() {
     await this.seedPayments();
   }
 
   private async seedPayments() {
-    const payments = [
-      {
-        name: 'payment1',
-        age: '0025',
-        address: 'Rua Exemplo 123',
-        cpf: '11111111111',
-        amountPaid: '00000000100000',
-        birthDate: '01011990',
-      },
-      {
-        name: 'payment2',
-        age: '0030',
-        address: 'Avenida Exemplo 456',
-        cpf: '22222222222',
-        amountPaid: '00000000200000',
-        birthDate: '02021985',
-      },
-      {
-        name: 'payment3',
-        age: '0040',
-        address: 'Praça Exemplo 789',
-        cpf: '33333333333',
-        amountPaid: '00000000300000',
-        birthDate: '03031975',
-      },
-    ];
+    const filePath = path.resolve(process.cwd(), 'src', 'seeder', 'mock', 'teste.txt');
+    const fileContent = fs.readFileSync(filePath, 'utf-8');
+    const payments = fileContent.split('\n').map(line => {
+      const name = line.substring(0, 15).trim();
+      const age = line.substring(15, 19).trim();
+      const address = line.substring(19, 53).trim();
+      const cpf = line.substring(53, 64).trim();
+      const amountPaid = line.substring(64, 80).trim();
+      const birthDate = line.substring(80, 88).trim();
+      return { name, age, address, cpf, amountPaid, birthDate };
+    });
 
     for (const payment of payments) {
       const existingPayment = await this.paymentRepository.findOne({
