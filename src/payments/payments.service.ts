@@ -58,7 +58,7 @@ export class PaymentsService {
         }
       }
 
-      return { message: 'File uploaded and data seeded successfully' };
+      return { message: 'File uploaded successfully' };
     } catch (error) {
       throw new InternalServerErrorException(
         'Error processing file',

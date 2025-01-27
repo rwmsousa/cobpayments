@@ -73,10 +73,10 @@ export class PaymentsController {
       }),
     }),
   )
-  @ApiOperation({ summary: 'Upload a file to seed payments' })
+  @ApiOperation({ summary: 'Upload a file payments' })
   @ApiResponse({
     status: 201,
-    description: 'File uploaded and data seeded successfully.',
+    description: 'File uploaded successfully.',
   })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   @ApiResponse({ status: 500, description: 'Internal Server Error.' })

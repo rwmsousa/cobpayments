@@ -8,7 +8,6 @@ This is an API project developed with NestJS and provides functionalities to man
 - User CRUD
 - Payment CRUD
 - API documentation with Swagger
-- Initial data seeding
 
 ## Functionalities
 
@@ -71,7 +70,7 @@ The complete route documentation can be accessed via Swagger at `http://localhos
    yarn migration:run
    ```
 
-5. Run the initial data seed:
+5. Run the initial:
    ```shell
    yarn start:dev
    ```
