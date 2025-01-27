@@ -9,13 +9,11 @@ import {
   BadRequestException,
   NotFoundException,
   InternalServerErrorException,
-  UseGuards,
   Logger,
   ForbiddenException,
 } from '@nestjs/common';
 import { ClientsService } from './clients.service';
 import { RegisterClientDto } from './dto/register-client.dto';
-import { AuthMiddleware } from '../middleware/auth.middleware';
 import { registerClientSchema } from './dto/register-client.schema';
 import {
   ApiTags,
@@ -69,7 +67,6 @@ export class ClientsController {
     }
   }
 
-  @UseGuards(AuthMiddleware)
   @ApiBearerAuth()
   @Get()
   @ApiOperation({ summary: 'Get all clients (admin only)' })
@@ -86,7 +83,6 @@ export class ClientsController {
     }
   }
 
-  @UseGuards(AuthMiddleware)
   @ApiBearerAuth()
   @Get(':id')
   @ApiOperation({ summary: 'Get a client by ID (admin only)' })
@@ -112,7 +108,6 @@ export class ClientsController {
     }
   }
 
-  @UseGuards(AuthMiddleware)
   @ApiBearerAuth()
   @Put(':id')
   @ApiOperation({ summary: 'Update a client by ID (admin only)' })
@@ -141,7 +136,6 @@ export class ClientsController {
     }
   }
 
-  @UseGuards(AuthMiddleware)
   @ApiBearerAuth()
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a client by ID (admin only)' })

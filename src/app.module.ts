@@ -4,15 +4,10 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ClientsModule } from './clients/clients.module';
-import { UserModule } from './user/user.module';
 import { SeederModule } from './seeder/seeder.module';
-import { AuthMiddleware } from './middleware/auth.middleware';
 import * as dotenv from 'dotenv';
-import { UserService } from './user/user.service';
-import { UserController } from './user/user.controller';
 import { ClientsService } from './clients/clients.service';
 import { ClientsController } from './clients/clients.controller';
-import { User } from './entities/user.entity';
 import { Client } from './entities/client.entity';
 
 dotenv.config();
@@ -36,27 +31,21 @@ dotenv.config();
       migrations: [__dirname + '/migrations/*{.ts,.js}'],
     }),
     ClientsModule,
-    UserModule,
     SeederModule,
-    TypeOrmModule.forFeature([User, Client]),
+    TypeOrmModule.forFeature([Client]),
   ],
-  controllers: [AppController, UserController, ClientsController],
-  providers: [AppService, UserService, ClientsService],
+  controllers: [AppController, ClientsController],
+  providers: [AppService, ClientsService],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(AuthMiddleware)
+      .apply()
       .forRoutes(
         { path: 'clients', method: RequestMethod.GET },
         { path: 'clients/:id', method: RequestMethod.GET },
         { path: 'clients/:id', method: RequestMethod.PUT },
         { path: 'clients/:id', method: RequestMethod.DELETE },
-        { path: 'user/register', method: RequestMethod.POST },
-        { path: 'user', method: RequestMethod.GET },
-        { path: 'user/:id', method: RequestMethod.GET },
-        { path: 'user', method: RequestMethod.PUT },
-        { path: 'user', method: RequestMethod.DELETE },
       );
   }
 }
