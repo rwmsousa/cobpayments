@@ -13,7 +13,7 @@ describe('AppService', () => {
   });
 
   describe('getHello', () => {
-    it('should return "Eteg API"', () => {
+    it('should return "cobuccio API"', () => {
       expect(appService.getHello()).toBe(`${process.env.COMPANY_NAME} API`);
     });
   });

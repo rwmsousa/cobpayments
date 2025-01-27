@@ -15,7 +15,7 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Eteg API"', () => {
+    it('should return "cobuccio API"', () => {
       expect(appController.getHello()).toBe(`${process.env.COMPANY_NAME} API`);
     });
   });

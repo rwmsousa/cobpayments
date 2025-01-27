@@ -37,8 +37,8 @@ The complete route documentation can be accessed via Swagger at `http://localhos
 
 1. Clone the repository:
    ```shell
-   git clone git@github.com:rwmsousa/boilerplate-nest.git
-   cd boilerplate-nest
+   git clone git@github.com:rwmsousa/cobpayments.git
+   cd cobpayments
    ```
 
 2. Install the dependencies:
