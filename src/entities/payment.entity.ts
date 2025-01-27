@@ -1,23 +1,25 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
-@Unique(['cpf'])
 export class Payment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ length: 15, default: ' ' })
   name: string;
 
-  @Column()
+  @Column({ length: 4, default: '0000' })
+  age: string;
+
+  @Column({ length: 34, default: ' ' })
+  address: string;
+
+  @Column({ length: 11, default: '00000000000' })
   cpf: string;
 
-  @Column()
-  email: string;
+  @Column({ length: 16, default: '0000000000000000' })
+  amountPaid: string;
 
-  @Column()
-  color: string;
-
-  @Column({ nullable: true })
-  annotations: string;
+  @Column({ length: 8, default: '00000000' })
+  birthDate: string;
 }

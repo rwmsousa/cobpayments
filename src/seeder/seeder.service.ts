@@ -18,24 +18,27 @@ export class SeederService {
     const payments = [
       {
         name: 'payment1',
+        age: '0025',
+        address: 'Rua Exemplo 123',
         cpf: '11111111111',
-        email: 'payment1@example.com',
-        color: 'red',
-        annotations: 'annotation1',
+        amountPaid: '00000000100000',
+        birthDate: '01011990',
       },
       {
         name: 'payment2',
+        age: '0030',
+        address: 'Avenida Exemplo 456',
         cpf: '22222222222',
-        email: 'payment2@example.com',
-        color: 'green',
-        annotations: 'annotation2',
+        amountPaid: '00000000200000',
+        birthDate: '02021985',
       },
       {
         name: 'payment3',
+        age: '0040',
+        address: 'Praça Exemplo 789',
         cpf: '33333333333',
-        email: 'payment3@example.com',
-        color: 'blue',
-        annotations: '',
+        amountPaid: '00000000300000',
+        birthDate: '03031975',
       },
     ];
 
