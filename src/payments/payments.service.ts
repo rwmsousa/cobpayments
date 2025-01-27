@@ -23,19 +23,7 @@ export class PaymentsService {
       throw new BadRequestException(error.details[0].message);
     }
 
-    if (!paymentData.cpf || !paymentData.name || !paymentData.email) {
-      throw new BadRequestException(
-        'Missing required fields: cpf, name, email',
-      );
-    }
-
     try {
-      const existingPaymentByCpf = await this.paymentRepository.findOne({
-        where: { cpf: paymentData.cpf },
-      });
-      if (existingPaymentByCpf) {
-        throw new BadRequestException('Payment already exists');
-      }
       return await this.paymentRepository.save(paymentData);
     } catch (error) {
       if (error instanceof BadRequestException) {
@@ -88,15 +76,6 @@ export class PaymentsService {
       });
       if (!existingPayment) {
         throw new NotFoundException('Payment not found');
-      }
-
-      if (paymentData.cpf && paymentData.cpf !== existingPayment.cpf) {
-        const existingPaymentByCpf = await this.paymentRepository.findOne({
-          where: { cpf: paymentData.cpf },
-        });
-        if (existingPaymentByCpf) {
-          throw new BadRequestException('CPF already in use');
-        }
       }
 
       const updatedPayment = { ...existingPayment, ...paymentData };

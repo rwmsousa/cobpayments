@@ -10,7 +10,6 @@ import {
   NotFoundException,
   InternalServerErrorException,
   Logger,
-  ForbiddenException,
 } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { RegisterPaymentDto } from './dto/register-payment.dto';
@@ -42,18 +41,8 @@ export class PaymentsController {
     if (error) {
       throw new BadRequestException(error.details[0].message);
     }
-    if (!paymentData.cpf || !paymentData.name || !paymentData.email) {
-      throw new BadRequestException(
-        'Missing required fields: cpf, name, email',
-      );
-    }
+
     try {
-      const existingPayment = await this.paymentsService.getPaymentByCpf(
-        paymentData.cpf,
-      );
-      if (existingPayment) {
-        throw new BadRequestException('CPF already in use');
-      }
       return await this.paymentsService.registerPayment(paymentData);
     } catch (error) {
       if (error instanceof BadRequestException) {
@@ -128,9 +117,6 @@ export class PaymentsController {
       if (error instanceof NotFoundException) {
         throw new NotFoundException('Payment not found');
       }
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException('CPF already in use');
-      }
       this.logger.error('Error updating payment', error.stack);
       throw new InternalServerErrorException('Error updating payment', error);
     }
@@ -152,9 +138,6 @@ export class PaymentsController {
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new NotFoundException('Payment not found');
-      }
-      if (error instanceof ForbiddenException) {
-        throw new ForbiddenException('Only admins can delete payments');
       }
       this.logger.error('Error deleting payment', error.stack);
       throw new InternalServerErrorException('Error deleting payment', error);
