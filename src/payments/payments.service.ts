@@ -50,12 +50,7 @@ export class PaymentsService {
       });
 
       for (const payment of payments) {
-        const existingPayment = await this.paymentRepository.findOne({
-          where: { cpf: payment.cpf },
-        });
-        if (!existingPayment) {
-          await this.paymentRepository.save(payment);
-        }
+        await this.paymentRepository.save(payment);
       }
 
       return { message: 'File uploaded successfully' };
