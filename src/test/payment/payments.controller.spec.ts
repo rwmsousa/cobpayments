@@ -60,16 +60,14 @@ describe('PaymentsController (e2e)', () => {
   });
 
   it('/payments/:id (GET)', async () => {
-    const payment = await request(app.getHttpServer())
-      .post('/payments')
-      .send({
-        name: 'Jane Doe',
-        age: '0030',
-        address: '456 Main St City',
-        cpf: '09876543210',
-        amountPaid: '0000000000005678',
-        birthDate: '19950101',
-      });
+    const payment = await request(app.getHttpServer()).post('/payments').send({
+      name: 'Jane Doe',
+      age: '0030',
+      address: '456 Main St City',
+      cpf: '09876543210',
+      amountPaid: '0000000000005678',
+      birthDate: '19950101',
+    });
 
     return request(app.getHttpServer())
       .get(`/payments/${payment.body.id}`)
@@ -81,16 +79,14 @@ describe('PaymentsController (e2e)', () => {
   });
 
   it('/payments/:id (PUT)', async () => {
-    const payment = await request(app.getHttpServer())
-      .post('/payments')
-      .send({
-        name: 'Jane Doe',
-        age: '0030',
-        address: '456 Main St City',
-        cpf: '09876543210',
-        amountPaid: '0000000000005678',
-        birthDate: '19950101',
-      });
+    const payment = await request(app.getHttpServer()).post('/payments').send({
+      name: 'Jane Doe',
+      age: '0030',
+      address: '456 Main St City',
+      cpf: '09876543210',
+      amountPaid: '0000000000005678',
+      birthDate: '19950101',
+    });
 
     const updatedPayment: RegisterPaymentDto = {
       name: 'Jane Smith',
@@ -111,16 +107,14 @@ describe('PaymentsController (e2e)', () => {
   });
 
   it('/payments/:id (DELETE)', async () => {
-    const payment = await request(app.getHttpServer())
-      .post('/payments')
-      .send({
-        name: 'Jane Doe',
-        age: '0030',
-        address: '456 Main St City',
-        cpf: '09876543210',
-        amountPaid: '0000000000005678',
-        birthDate: '19950101',
-      });
+    const payment = await request(app.getHttpServer()).post('/payments').send({
+      name: 'Jane Doe',
+      age: '0030',
+      address: '456 Main St City',
+      cpf: '09876543210',
+      amountPaid: '0000000000005678',
+      birthDate: '19950101',
+    });
 
     return request(app.getHttpServer())
       .delete(`/payments/${payment.body.id}`)
