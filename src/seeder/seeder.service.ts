@@ -21,9 +21,15 @@ export class SeederService implements OnModuleInit {
   }
 
   private async seedPayments() {
-    const filePath = path.resolve(process.cwd(), 'src', 'seeder', 'mock', 'teste.txt');
+    const filePath = path.resolve(
+      process.cwd(),
+      'src',
+      'seeder',
+      'mock',
+      'teste.txt',
+    );
     const fileContent = fs.readFileSync(filePath, 'utf-8');
-    const payments = fileContent.split('\n').map(line => {
+    const payments = fileContent.split('\n').map((line) => {
       const name = line.substring(0, 15).trim();
       const age = line.substring(15, 19).trim();
       const address = line.substring(19, 53).trim();
