@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { Payment } from '../entities/payment.entity';
 import { RegisterPaymentDto } from './dto/register-payment.dto';
 import { registerPaymentSchema } from './dto/register-payment.schema';
+import * as fs from 'fs';
 
 @Injectable()
 export class PaymentsService {
@@ -32,6 +33,39 @@ export class PaymentsService {
       throw new InternalServerErrorException(
         'Error registering payment: ' + error.message,
       );
+    }
+  }
+
+  async processFile(filePath: string) {
+    try {
+      const fileContent = fs.readFileSync(filePath, 'utf-8');
+      const payments = fileContent.split('\n').map((line) => {
+        const name = line.substring(0, 15).trim();
+        const age = line.substring(15, 19).trim();
+        const address = line.substring(19, 53).trim();
+        const cpf = line.substring(53, 64).trim();
+        const amountPaid = line.substring(64, 80).trim();
+        const birthDate = line.substring(80, 88).trim();
+        return { name, age, address, cpf, amountPaid, birthDate };
+      });
+
+      for (const payment of payments) {
+        const existingPayment = await this.paymentRepository.findOne({
+          where: { cpf: payment.cpf },
+        });
+        if (!existingPayment) {
+          await this.paymentRepository.save(payment);
+        }
+      }
+
+      return { message: 'File uploaded and data seeded successfully' };
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Error processing file',
+        error.message,
+      );
+    } finally {
+      fs.unlinkSync(filePath);
     }
   }
 

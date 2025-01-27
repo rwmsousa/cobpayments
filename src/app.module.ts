@@ -4,7 +4,6 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PaymentsModule } from './payments/payments.module';
-import { SeederModule } from './seeder/seeder.module';
 import * as dotenv from 'dotenv';
 import { PaymentsService } from './payments/payments.service';
 import { PaymentsController } from './payments/payments.controller';
@@ -24,15 +23,14 @@ dotenv.config();
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      // synchronize: Boolean(process.env.DATABASE_SYNCHRONIZE),
-      synchronize: true,
+      synchronize: Boolean(process.env.DATABASE_SYNCHRONIZE),
+      // synchronize: true,
       schema: process.env.DATABASE_SCHEMA,
       logging: Boolean(process.env.DATABASE_LOGGING),
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       migrations: [__dirname + '/migrations/*{.ts,.js}'],
     }),
     PaymentsModule,
-    SeederModule,
     TypeOrmModule.forFeature([Payment]),
   ],
   controllers: [AppController, PaymentsController],
@@ -47,6 +45,7 @@ export class AppModule {
         { path: 'payments/:id', method: RequestMethod.GET },
         { path: 'payments/:id', method: RequestMethod.PUT },
         { path: 'payments/:id', method: RequestMethod.DELETE },
+        { path: 'payments/upload', method: RequestMethod.POST },
       );
   }
 }

@@ -10,7 +10,11 @@ import {
   NotFoundException,
   InternalServerErrorException,
   Logger,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 import { PaymentsService } from './payments.service';
 import { RegisterPaymentDto } from './dto/register-payment.dto';
 import { registerPaymentSchema } from './dto/register-payment.schema';
@@ -22,6 +26,7 @@ import {
   ApiBearerAuth,
   ApiResponse,
 } from '@nestjs/swagger';
+import { Multer } from 'multer';
 
 @ApiTags('payments')
 @Controller('payments')
@@ -52,6 +57,41 @@ export class PaymentsController {
       throw new InternalServerErrorException(
         'Error registering payment: ' + error.message,
         error,
+      );
+    }
+  }
+
+  @Post('upload')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const filename = `${Date.now()}-${file.originalname}`;
+          cb(null, filename);
+        },
+      }),
+    }),
+  )
+  @ApiOperation({ summary: 'Upload a file to seed payments' })
+  @ApiResponse({
+    status: 201,
+    description: 'File uploaded and data seeded successfully.',
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error.' })
+  async uploadFile(@UploadedFile() file: Multer.File) {
+    if (!file) {
+      throw new BadRequestException('File is required');
+    }
+
+    try {
+      return await this.paymentsService.processFile(file.path);
+    } catch (error) {
+      this.logger.error('Error processing file', error.stack);
+      throw new InternalServerErrorException(
+        'Error processing file',
+        error.message,
       );
     }
   }
