@@ -5,7 +5,7 @@ export const swaggerDocumentOptions = new DocumentBuilder()
   .setDescription('Rest API with NestJS, Typeorm and Postgres')
   .setVersion('1.0')
   .addTag('user', 'Operations related to users')
-  .addTag('clients', 'Operations related to clients')
+  .addTag('payments', 'Operations related to payments')
   .addBearerAuth()
   .build();
 

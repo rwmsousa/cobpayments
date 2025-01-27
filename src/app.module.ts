@@ -3,12 +3,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ClientsModule } from './clients/clients.module';
+import { PaymentsModule } from './payments/payments.module';
 import { SeederModule } from './seeder/seeder.module';
 import * as dotenv from 'dotenv';
-import { ClientsService } from './clients/clients.service';
-import { ClientsController } from './clients/clients.controller';
-import { Client } from './entities/client.entity';
+import { PaymentsService } from './payments/payments.service';
+import { PaymentsController } from './payments/payments.controller';
+import { Payment } from './entities/payment.entity';
 
 dotenv.config();
 
@@ -24,28 +24,29 @@ dotenv.config();
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      synchronize: Boolean(process.env.DATABASE_SYNCHRONIZE),
+      // synchronize: Boolean(process.env.DATABASE_SYNCHRONIZE),
+      synchronize: true,
       schema: process.env.DATABASE_SCHEMA,
       logging: Boolean(process.env.DATABASE_LOGGING),
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       migrations: [__dirname + '/migrations/*{.ts,.js}'],
     }),
-    ClientsModule,
+    PaymentsModule,
     SeederModule,
-    TypeOrmModule.forFeature([Client]),
+    TypeOrmModule.forFeature([Payment]),
   ],
-  controllers: [AppController, ClientsController],
-  providers: [AppService, ClientsService],
+  controllers: [AppController, PaymentsController],
+  providers: [AppService, PaymentsService],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply()
       .forRoutes(
-        { path: 'clients', method: RequestMethod.GET },
-        { path: 'clients/:id', method: RequestMethod.GET },
-        { path: 'clients/:id', method: RequestMethod.PUT },
-        { path: 'clients/:id', method: RequestMethod.DELETE },
+        { path: 'payments', method: RequestMethod.GET },
+        { path: 'payments/:id', method: RequestMethod.GET },
+        { path: 'payments/:id', method: RequestMethod.PUT },
+        { path: 'payments/:id', method: RequestMethod.DELETE },
       );
   }
 }

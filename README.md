@@ -1,12 +1,12 @@
 # REST API
 
-This is an API project developed with NestJS and provides functionalities to manage users and clients.
+This is an API project developed with NestJS and provides functionalities to manage users and payments.
 
 ## Features
 
 - User authentication and authorization
 - User CRUD
-- Client CRUD
+- Payment CRUD
 - API documentation with Swagger
 - Initial data seeding
 
@@ -21,13 +21,13 @@ This is an API project developed with NestJS and provides functionalities to man
 - Update user data (authenticated user or admin)
 - Delete a user (admin only)
 
-### Clients
+### Payments
 
-- Register new clients (any user, no authentication required)
-- List all clients (admin only)
-- Get client details by ID (admin only)
-- Update client data (admin only)
-- Delete a client (admin only)
+- Register new payments (any user, no authentication required)
+- List all payments (admin only)
+- Get payment details by ID (admin only)
+- Update payment data (admin only)
+- Delete a payment (admin only)
 
 ## Routes
 

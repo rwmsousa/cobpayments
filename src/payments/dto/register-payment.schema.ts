@@ -1,6 +1,6 @@
 import * as Joi from 'joi';
 
-export const registerClientSchema = Joi.object({
+export const registerPaymentSchema = Joi.object({
   name: Joi.string().min(3).max(50).required().messages({
     'string.base': 'Name must be a text',
     'string.empty': 'Name cannot be empty',

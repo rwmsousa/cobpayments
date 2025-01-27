@@ -1,50 +1,50 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Client } from '../entities/client.entity';
+import { Payment } from '../entities/payment.entity';
 
 @Injectable()
 export class SeederService {
   constructor(
-    @InjectRepository(Client)
-    private readonly clientRepository: Repository<Client>,
+    @InjectRepository(Payment)
+    private readonly paymentRepository: Repository<Payment>,
   ) {}
 
   async seed() {
-    await this.seedClients();
+    await this.seedPayments();
   }
 
-  private async seedClients() {
-    const clients = [
+  private async seedPayments() {
+    const payments = [
       {
-        name: 'client1',
+        name: 'payment1',
         cpf: '11111111111',
-        email: 'client1@example.com',
+        email: 'payment1@example.com',
         color: 'red',
         annotations: 'annotation1',
       },
       {
-        name: 'client2',
+        name: 'payment2',
         cpf: '22222222222',
-        email: 'client2@example.com',
+        email: 'payment2@example.com',
         color: 'green',
         annotations: 'annotation2',
       },
       {
-        name: 'client3',
+        name: 'payment3',
         cpf: '33333333333',
-        email: 'client3@example.com',
+        email: 'payment3@example.com',
         color: 'blue',
         annotations: '',
       },
     ];
 
-    for (const client of clients) {
-      const existingClient = await this.clientRepository.findOne({
-        where: { cpf: client.cpf },
+    for (const payment of payments) {
+      const existingPayment = await this.paymentRepository.findOne({
+        where: { cpf: payment.cpf },
       });
-      if (!existingClient) {
-        await this.clientRepository.save(client);
+      if (!existingPayment) {
+        await this.paymentRepository.save(payment);
       }
     }
   }

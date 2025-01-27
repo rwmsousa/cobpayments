@@ -1,21 +1,24 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class RegisterClientDto {
-  @ApiProperty({ example: 'John Doe', description: 'The name of the client' })
+export class RegisterPaymentDto {
+  @ApiProperty({ example: 'John Doe', description: 'The name of the payment' })
   name: string;
 
-  @ApiProperty({ example: '12345678900', description: 'The CPF of the client' })
+  @ApiProperty({
+    example: '12345678900',
+    description: 'The CPF of the payment',
+  })
   cpf: string;
 
   @ApiProperty({
     example: 'john.doe@example.com',
-    description: 'The email of the client',
+    description: 'The email of the payment',
   })
   email: string;
 
   @ApiProperty({
     example: 'blue',
-    description: 'The favorite color of the client',
+    description: 'The favorite color of the payment',
   })
   color: string;
 
