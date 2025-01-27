@@ -5,26 +5,32 @@ export class RegisterPaymentDto {
   name: string;
 
   @ApiProperty({
+    example: '0025',
+    description: 'The age of the payment',
+  })
+  age: string;
+
+  @ApiProperty({
+    example: '123 Main St City',
+    description: 'The address of the payment',
+  })
+  address: string;
+
+  @ApiProperty({
     example: '12345678900',
     description: 'The CPF of the payment',
   })
   cpf: string;
 
   @ApiProperty({
-    example: 'john.doe@example.com',
-    description: 'The email of the payment',
+    example: '0000000000001234',
+    description: 'The amount paid',
   })
-  email: string;
+  amountPaid: string;
 
   @ApiProperty({
-    example: 'blue',
-    description: 'The favorite color of the payment',
+    example: '19900101',
+    description: 'The birth date of the payment',
   })
-  color: string;
-
-  @ApiProperty({
-    example: 'Some annotations',
-    description: 'Additional annotations',
-  })
-  annotations: string;
+  birthDate: string;
 }
