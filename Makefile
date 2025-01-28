@@ -16,8 +16,9 @@ logs:
 	docker-compose logs -f app
 
 restart:
-	@if [ $$(docker ps -q) ]; then docker stop $$(docker ps -q); fi
+	@if [ -n "$$(docker ps -q)" ]; then docker stop $$(docker ps -q); fi
 	@mkdir -p postgres-data
+	docker-compose build
 	docker-compose up -d
 	docker-compose logs -f app
 
