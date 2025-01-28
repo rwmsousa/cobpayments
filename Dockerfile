@@ -17,10 +17,16 @@ RUN mkdir -p /app/uploads && chmod 777 /app/uploads
 
 COPY package.json yarn.lock ./
 
-RUN yarn install
+RUN yarn
+
+COPY tsconfig.json ./
+
+RUN mkdir -p /app/dist
 
 COPY . .
 
+RUN yarn build
+
 EXPOSE 3001
 
-CMD ["yarn", "start:prod"]
+CMD ["yarn", "start"]

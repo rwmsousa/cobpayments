@@ -27,7 +27,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: yarn start:prod
+    command: yarn start
     environment:
       - NODE_ENV=${NODE_ENV}
       - PORT=${PORT}
