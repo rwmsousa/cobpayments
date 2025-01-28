@@ -7,9 +7,9 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
       POSTGRES_DB: ${DATABASE_NAME}
     ports:
-      - '5434:5432'
+      - '5433:5432'
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ./postgres-data:/var/lib/postgresql/data
     restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER}"]
@@ -32,7 +32,7 @@ services:
       - NODE_ENV=${NODE_ENV}
       - PORT=${PORT}
       - DATABASE_HOST=db
-      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_PORT=5432
       - DATABASE_USER=${DATABASE_USER}
       - DATABASE_PASSWORD=${DATABASE_PASSWORD}
       - DATABASE_NAME=${DATABASE_NAME}
@@ -47,7 +47,8 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-      - pgdata:/app/pgdata
+      - postgres-data:/app/postgres-data
+      - ./uploads:/app/uploads
     restart: always
     logging:
       driver: "json-file"
@@ -56,9 +57,9 @@ services:
         max-file: "10"
 
 volumes:
-  pgdata:
+  postgres-data:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: ${PWD}/pgdata
+      device: ${PWD}/postgres-data

@@ -5,7 +5,8 @@ build:
 	docker build -t $(IMAGE_NAME) . --no-cache
 
 up:
-	@mkdir -p pgdata
+	@mkdir -p postgres-data
+	@chmod 777 postgres-data
 	docker-compose up -d
 
 down:
@@ -15,9 +16,8 @@ logs:
 	docker-compose logs -f app
 
 restart:
-	@mkdir -p pgdata
-	docker-compose down
-	docker-compose build --no-cache
+	@if [ $$(docker ps -q) ]; then docker stop $$(docker ps -q); fi
+	@mkdir -p postgres-data
 	docker-compose up -d
 	docker-compose logs -f app
 
