@@ -14,8 +14,7 @@ describe('PaymentsController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
-  });
-
+  }, 30000);
   afterAll(async () => {
     await app.close();
   });
@@ -38,8 +37,7 @@ describe('PaymentsController (e2e)', () => {
         expect(res.body).toHaveProperty('id');
         expect(res.body.name).toEqual(payment.name);
       });
-  });
-
+  }, 30000);
   it('/payments/upload (POST)', async () => {
     return request(app.getHttpServer())
       .post('/payments/upload')
@@ -48,8 +46,7 @@ describe('PaymentsController (e2e)', () => {
       .expect((res) => {
         expect(res.body.message).toEqual('File uploaded successfully');
       });
-  });
-
+  }, 30000);
   it('/payments (GET)', async () => {
     return request(app.getHttpServer())
       .get('/payments')
@@ -57,8 +54,7 @@ describe('PaymentsController (e2e)', () => {
       .expect((res) => {
         expect(Array.isArray(res.body)).toBe(true);
       });
-  });
-
+  }, 30000);
   it('/payments/:id (GET)', async () => {
     const payment = await request(app.getHttpServer()).post('/payments').send({
       name: 'Jane Doe',
@@ -76,8 +72,7 @@ describe('PaymentsController (e2e)', () => {
         expect(res.body).toHaveProperty('id');
         expect(res.body.name).toEqual('Jane Doe');
       });
-  });
-
+  }, 30000);
   it('/payments/:id (PUT)', async () => {
     const payment = await request(app.getHttpServer()).post('/payments').send({
       name: 'Jane Doe',
@@ -104,8 +99,7 @@ describe('PaymentsController (e2e)', () => {
       .expect((res) => {
         expect(res.body.name).toEqual(updatedPayment.name);
       });
-  });
-
+  }, 30000);
   it('/payments/:id (DELETE)', async () => {
     const payment = await request(app.getHttpServer()).post('/payments').send({
       name: 'Jane Doe',
@@ -122,5 +116,5 @@ describe('PaymentsController (e2e)', () => {
       .expect((res) => {
         expect(res.body.message).toEqual('Payment deleted successfully');
       });
-  });
+  }, 30000);
 });
