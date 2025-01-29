@@ -67,6 +67,7 @@ services:
       - REACT_APP_API_URL=http://localhost:3001
     volumes:
       - ./frontend:/app
+      - /app/node_modules
     depends_on:
       - app
     restart: always
@@ -75,6 +76,7 @@ services:
       options:
         max-size: "200k"
         max-file: "10"
+    command: yarn dev
 
 volumes:
   postgres-data:
