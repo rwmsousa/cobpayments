@@ -14,7 +14,7 @@ async function bootstrap() {
   await AppDataSource.runMigrations();
 
   app.enableCors({
-    origin: [process.env.FRONTEND_URL],
+    origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
     allowedHeaders: 'Content-Type, Authorization',

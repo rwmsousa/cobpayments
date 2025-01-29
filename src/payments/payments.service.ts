@@ -74,6 +74,27 @@ export class PaymentsService {
     }
   }
 
+  async listPaymentsPaginated(
+    page: number,
+    limit: number,
+  ): Promise<{ payments: Payment[]; total: number }> {
+    if (page < 0) {
+      throw new BadRequestException('Page number must not be negative');
+    }
+    try {
+      const offset = page * limit;
+      const [payments, total] = await this.paymentRepository.findAndCount({
+        skip: offset,
+        take: limit,
+      });
+      return { payments, total };
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Error listing payments: ' + error.message,
+      );
+    }
+  }
+
   async getPayment(id: number) {
     try {
       const payment = await this.paymentRepository.findOne({ where: { id } });

@@ -12,6 +12,7 @@ import {
   Logger,
   UploadedFile,
   UseInterceptors,
+  Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -106,6 +107,28 @@ export class PaymentsController {
   async listPayments() {
     try {
       return await this.paymentsService.listPayments();
+    } catch (error) {
+      this.logger.error('Error listing payments', error.stack);
+      throw new InternalServerErrorException('Error listing payments', error);
+    }
+  }
+
+  @ApiBearerAuth()
+  @Get('paginated')
+  @ApiOperation({ summary: 'Get paginated payments (admin only)' })
+  @ApiResponse({ status: 200, description: 'Payments retrieved successfully.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error.' })
+  async listPaymentsPaginated(
+    @Query('page') page: number = 0,
+    @Query('limit') limit: number = 10,
+  ) {
+    if (page < 0) {
+      throw new BadRequestException('Page number must not be negative');
+    }
+    try {
+      return await this.paymentsService.listPaymentsPaginated(page, limit);
     } catch (error) {
       this.logger.error('Error listing payments', error.stack);
       throw new InternalServerErrorException('Error listing payments', error);
