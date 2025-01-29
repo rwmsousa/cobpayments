@@ -86,6 +86,7 @@ export class PaymentsService {
       const [payments, total] = await this.paymentRepository.findAndCount({
         skip: offset,
         take: limit,
+        order: { id: 'ASC' },
       });
       return { payments, total };
     } catch (error) {

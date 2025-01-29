@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, IconButton, CircularProgress, Alert } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, IconButton, CircularProgress, Alert, Button } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import axios from "axios";
 import styles from "./page.module.css";
@@ -42,6 +42,44 @@ export default function Home() {
         setError("Erro ao buscar dados da API. Verifique se o servidor está em execução.");
         setLoading(false);
       });
+  };
+
+  const fetchAllPayments = () => {
+    axios.get('http://localhost:3001/payments')
+      .then((response) => {
+        const allPayments = response.data;
+        downloadCSV(allPayments);
+      })
+      .catch((error) => {
+        console.error("Erro ao buscar todos os dados da API:", error);
+        setError("Erro ao buscar todos os dados da API. Verifique se o servidor está em execução.");
+      });
+  };
+
+  const downloadCSV = (data: Payment[]) => {
+    const csvRows = [
+      ["ID", "Nome", "Idade", "Endereço", "CPF", "Valor Pago", "Nascimento"],
+      ...data.map(payment => [
+        payment.id,
+        payment.name,
+        payment.age,
+        payment.address,
+        payment.cpf,
+        payment.amountPaid,
+        payment.birthDate
+      ])
+    ];
+
+    const csvContent = csvRows.map(e => e.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", "payments.csv");
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
@@ -166,6 +204,7 @@ export default function Home() {
     <div className={styles.page}>
       <main className={styles.main}>
         <h1>Lista de pagamentos</h1>
+
         <Paper style={{ maxHeight: '90%', overflowY: 'auto' }}>
           <TableContainer component={Paper}>
             <Table>
@@ -214,6 +253,12 @@ export default function Home() {
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </Paper>
+
+        <div style={{ marginTop: '20px' }}>
+          <Button variant="contained" color="primary" onClick={ fetchAllPayments }>
+            Download CSV
+          </Button>
+        </div>
       </main>
     </div>
   );
