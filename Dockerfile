@@ -3,7 +3,8 @@ FROM node:22.13-slim
 RUN apt-get update && apt-get install -y wget gnupg \
     && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && echo "deb http://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
-    && apt-get update && apt-get install -y postgresql-client
+    && apt-get update && apt-get install -y postgresql-client \
+    && apt-get install -y python3 python3-pip
 
 WORKDIR /app
 
