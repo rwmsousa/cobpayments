@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, IconButton, CircularProgress, Alert, Button } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, IconButton, CircularProgress, Alert, Button, Input } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import axios from "axios";
 import styles from "./page.module.css";
@@ -23,31 +23,27 @@ export default function Home() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [total, setTotal] = useState(0);
-  const [domLoaded, setDomLoaded] = useState(false);
 
   useEffect(() => {
-    setDomLoaded(true);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
-    if (domLoaded) {
+    if (loading) {
       fetchPayments(page, rowsPerPage);
     }
-  }, [page, rowsPerPage, domLoaded]);
+  }, [ page, rowsPerPage, loading ]);
 
   const fetchPayments = (page: number, rowsPerPage: number) => {
-    setLoading(true);
     axios.get(`http://localhost:3001/payments/paginated?page=${page}&limit=${rowsPerPage}`)
       .then((response) => {
         console.log("Dados da API:", response.data);
         setPayments(response.data.payments);
         setTotal(response.data.total);
-        setLoading(false);
       })
       .catch((error) => {
         console.error("Erro ao buscar dados da API:", error);
         setError("Erro ao buscar dados da API. Verifique se o servidor está em execução.");
-        setLoading(false);
       });
   };
 
@@ -87,6 +83,29 @@ export default function Home() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setLoading(true);
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        await axios.post('http://localhost:3001/payments/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        setLoading(false);
+        window.location.reload();
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        setError("Error uploading file. Please try again.");
+        setLoading(false);
+      }
+    }
   };
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
@@ -199,79 +218,88 @@ export default function Home() {
     return `${parsedDate.getDate()}/${parsedDate.getMonth() + 1}/${parsedDate.getFullYear()}`;
   };
 
-  if (loading) {
-    return <CircularProgress />;
-  }
-
-  if (error) {
-    return <Alert severity="error">{error}</Alert>;
-  }
-
   return (
     <div className={styles.page}>
+      {loading && (
+        <div className={styles.loadingOverlay} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 10, position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
+          <CircularProgress />
+        </div>
+      )}
       <main className={styles.main}>
         <h1>Lista de pagamentos</h1>
 
-        {domLoaded && payments.length === 0 ? (
+        {total == 0 ? (
           <p>Nenhum pagamento encontrado.</p>
         ) : (
-          <>
-            <Paper style={{ maxHeight: '90%', overflowY: 'auto' }}>
-              <TableContainer component={Paper}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell style={{ width: '50px' }}>ID</TableCell>
-                      <TableCell style={{ width: '150px' }}>Nome</TableCell>
-                      <TableCell style={{ width: '50px' }}>Idade</TableCell>
-                      <TableCell style={{ width: '250px' }}>Endereço</TableCell>
-                      <TableCell style={{ width: '150px' }}>CPF</TableCell>
-                      <TableCell style={{ width: '150px' }}>Valor Pago</TableCell>
-                      <TableCell style={{ width: '150px' }}>Nascimento</TableCell>
-                      <TableCell style={{ width: '100px' }}>Ações</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {payments.map((payment) => (
-                      <TableRow key={payment.id}>
-                        <TableCell style={{ width: '50px' }}>{payment.id}</TableCell>
-                        <TableCell style={{ width: '150px' }}>{payment.name}</TableCell>
-                        <TableCell style={{ width: '50px' }}>{Number(payment.age)}</TableCell>
-                        <TableCell style={{ width: '250px' }}>{payment.address}</TableCell>
-                        <TableCell style={{ width: '150px' }}>{formatCpf(payment.cpf)}</TableCell>
-                        <TableCell style={{ width: '150px' }}>{formatAmount(payment.amountPaid)}</TableCell>
-                        <TableCell style={{ width: '150px' }}>{formatDate(payment.birthDate)}</TableCell>
-                        <TableCell style={{ width: '100px', display: 'flex' }}>
-                          <IconButton onClick={() => handleEdit(payment.id)}>
-                            <Edit />
-                          </IconButton>
-                          <IconButton onClick={() => handleDelete(payment.id)}>
-                            <Delete />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-              <TablePagination
-                rowsPerPageOptions={[5, 10, 25]}
-                component="div"
-                count={total}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-              />
-            </Paper>
+              <>
+                <Paper style={{ maxHeight: '90%', overflowY: 'auto' }}>
+                  <TableContainer component={Paper}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell style={{ width: '50px' }}>ID</TableCell>
+                          <TableCell style={{ width: '150px' }}>Nome</TableCell>
+                          <TableCell style={{ width: '50px' }}>Idade</TableCell>
+                          <TableCell style={{ width: '250px' }}>Endereço</TableCell>
+                          <TableCell style={{ width: '150px' }}>CPF</TableCell>
+                          <TableCell style={{ width: '150px' }}>Valor Pago</TableCell>
+                          <TableCell style={{ width: '150px' }}>Nascimento</TableCell>
+                          <TableCell style={{ width: '100px' }}>Ações</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {payments.map((payment) => (
+                          <TableRow key={payment.id}>
+                            <TableCell style={{ width: '50px' }}>{payment.id}</TableCell>
+                            <TableCell style={{ width: '150px' }}>{payment.name}</TableCell>
+                            <TableCell style={{ width: '50px' }}>{Number(payment.age)}</TableCell>
+                            <TableCell style={{ width: '250px' }}>{payment.address}</TableCell>
+                            <TableCell style={{ width: '150px' }}>{formatCpf(payment.cpf)}</TableCell>
+                            <TableCell style={{ width: '150px' }}>{formatAmount(payment.amountPaid)}</TableCell>
+                            <TableCell style={{ width: '150px' }}>{formatDate(payment.birthDate)}</TableCell>
+                            <TableCell style={{ width: '100px', display: 'flex' }}>
+                              <IconButton onClick={() => handleEdit(payment.id)}>
+                                <Edit />
+                              </IconButton>
+                              <IconButton onClick={() => handleDelete(payment.id)}>
+                                <Delete />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                  <TablePagination
+                    rowsPerPageOptions={[5, 10, 25]}
+                    component="div"
+                    count={total}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                  />
+                </Paper>
 
-            <div style={{ marginTop: '20px' }}>
-              <Button variant="contained" color="primary" onClick={fetchAllPayments}>
-                Download CSV
-              </Button>
-            </div>
-          </>
-        )}
+                <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', gap: '20px', zIndex:0}}>
+                  <Button variant="contained" color="primary" onClick={fetchAllPayments}>
+                    Download CSV
+                  </Button>
+                  <label htmlFor="upload-csv">
+                    <Input
+                      id="upload-csv"
+                      type="file"
+                      inputProps={{ accept: ".csv" }}
+                      onChange={handleFileUpload}
+                      style={{ display: 'none' }}
+                    />
+                    <Button variant="contained" color="primary" component="span">
+                      Upload CSV
+                    </Button>
+                  </label>
+                </div>
+              </>
+            )}
       </main>
     </div>
   );
