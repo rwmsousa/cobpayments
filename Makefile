@@ -2,12 +2,12 @@ include .env
 IMAGE_NAME=$(DOCKER_IMAGE_NAME)
 
 build:
+	sudo yarn install && sudo yarn build
+	cd frontend && sudo yarn install && sudo yarn build
 	docker build -t $(IMAGE_NAME) . --no-cache
 
 up:
-	@mkdir -p postgres-data
-	@chmod 777 postgres-data
-	docker-compose up -d
+	docker-compose up
 
 down:
 	docker-compose down
@@ -17,10 +17,8 @@ logs:
 
 restart:
 	@if [ -n "$$(docker ps -q)" ]; then docker stop $$(docker ps -q); fi
-	@mkdir -p postgres-data
 	docker-compose build
-	docker-compose up -d
-	docker-compose logs -f app
+	docker-compose up
 
 start:
 	yarn start
