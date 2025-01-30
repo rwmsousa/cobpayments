@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, IconButton, CircularProgress, Alert, Button, Input } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, IconButton, CircularProgress, ThemeProvider, Button, Input, createTheme } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import axios from "axios";
 import styles from "./page.module.css";
@@ -16,35 +16,48 @@ interface Payment {
   birthDate: string;
 }
 
+const theme = createTheme({
+  typography: {
+    fontFamily: [
+      "Geist",
+      "sans-serif",
+    ].join(","),
+    h1: {
+      fontSize: "2.25rem",
+      fontWeight: 900,
+    },
+    fontSize: 10,
+
+  },
+})
+
 export default function Home() {
-  const [payments, setPayments] = useState<Payment[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [total, setTotal] = useState(0);
+  const [ payments, setPayments ] = useState<Payment[]>([]);
+  const [ loading, setLoading ] = useState(true);
+  const [ page, setPage ] = useState(0);
+  const [ rowsPerPage, setRowsPerPage ] = useState(10);
+  const [ total, setTotal ] = useState(0);
+  const [ initialRender, setInitialRender ] = useState(true);
 
   useEffect(() => {
-    setLoading(false);
-  }, []);
+    // Este efeito é executado apenas no cliente após a hidratação.
+    setInitialRender(false); // Define como false após a primeira renderização no cliente.
 
-  useEffect(() => {
-    if (loading) {
-      fetchPayments(page, rowsPerPage);
+    fetchPayments(page, rowsPerPage); // Carrega os dados.
+  }, [ page, rowsPerPage ]); // Dependências atualizadas
+
+  const fetchPayments = async (page: number, rowsPerPage: number) => {
+    setLoading(true); // Define loading como true antes da requisição
+    try {
+      const response = await axios.get(`http://localhost:3001/payments/paginated?page=${ page }&limit=${ rowsPerPage }`);
+      console.log("Dados da API:", response.data);
+      setPayments(response.data.payments);
+      setTotal(response.data.total);
+    } catch (error) {
+      console.error("Erro ao buscar dados da API:", error);
+    } finally {
+      setLoading(false); // Define loading como false independentemente do resultado
     }
-  }, [ page, rowsPerPage, loading ]);
-
-  const fetchPayments = (page: number, rowsPerPage: number) => {
-    axios.get(`http://localhost:3001/payments/paginated?page=${page}&limit=${rowsPerPage}`)
-      .then((response) => {
-        console.log("Dados da API:", response.data);
-        setPayments(response.data.payments);
-        setTotal(response.data.total);
-      })
-      .catch((error) => {
-        console.error("Erro ao buscar dados da API:", error);
-        setError("Erro ao buscar dados da API. Verifique se o servidor está em execução.");
-      });
   };
 
   const fetchAllPayments = () => {
@@ -55,13 +68,12 @@ export default function Home() {
       })
       .catch((error) => {
         console.error("Erro ao buscar todos os dados da API:", error);
-        setError("Erro ao buscar todos os dados da API. Verifique se o servidor está em execução.");
       });
   };
 
   const downloadCSV = (data: Payment[]) => {
     const csvRows = [
-      ["ID", "Nome", "Idade", "Endereço", "CPF", "Valor Pago", "Nascimento"],
+      [ "ID", "Nome", "Idade", "Endereço", "CPF", "Valor Pago", "Nascimento" ],
       ...data.map(payment => [
         payment.id,
         payment.name,
@@ -74,7 +86,7 @@ export default function Home() {
     ];
 
     const csvContent = csvRows.map(e => e.join(",")).join("\n");
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([ csvContent ], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
@@ -86,7 +98,7 @@ export default function Home() {
   };
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    const file = event.target.files?.[ 0 ];
     if (file) {
       setLoading(true);
       const formData = new FormData();
@@ -102,7 +114,6 @@ export default function Home() {
         window.location.reload();
       } catch (error) {
         console.error("Error uploading file:", error);
-        setError("Error uploading file. Please try again.");
         setLoading(false);
       }
     }
@@ -168,7 +179,7 @@ export default function Home() {
         } : payment
       );
       setPayments(updatedPayments);
-      axios.put(`http://localhost:3001/payments/${id}`, {
+      axios.put(`http://localhost:3001/payments/${ id }`, {
         ...paymentToEdit,
         name: updatedName,
         age: updatedAge,
@@ -189,7 +200,7 @@ export default function Home() {
   const handleDelete = (id: number) => {
     const updatedPayments = payments.filter(payment => payment.id !== id);
     setPayments(updatedPayments);
-    axios.delete(`http://localhost:3001/payments/${id}`)
+    axios.delete(`http://localhost:3001/payments/${ id }`)
       .then((response) => {
         console.log("Deleted payment:", response.data);
       })
@@ -215,92 +226,100 @@ export default function Home() {
     const day = parseInt(date.slice(6, 8));
     const parsedDate = new Date(year, month - 1, day);
 
-    return `${parsedDate.getDate()}/${parsedDate.getMonth() + 1}/${parsedDate.getFullYear()}`;
+    return `${ parsedDate.getDate() }/${ parsedDate.getMonth() + 1 }/${ parsedDate.getFullYear() }`;
   };
 
   return (
-    <div className={styles.page}>
-      {loading && (
-        <div className={styles.loadingOverlay} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 10, position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
+    <div className={ styles.page }>
+      { loading && initialRender && (
+        <div className={ styles.loadingOverlay } style={ { display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 10, position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(255, 255, 255, 0.5)' } }>
           <CircularProgress />
         </div>
-      )}
-      <main className={styles.main}>
-        <h1>Lista de pagamentos</h1>
+      ) }
+      { !loading && (
+        <main className={ styles.main }>
+          <h1>Lista de pagamentos</h1>
 
-        {total == 0 ? (
-          <p>Nenhum pagamento encontrado.</p>
-        ) : (
-              <>
-                <Paper style={{ maxHeight: '90%', overflowY: 'auto' }}>
-                  <TableContainer component={Paper}>
+          { total == 0 ? (
+            <p>Nenhum pagamento encontrado.</p>
+          ) : (
+            <>
+              <ThemeProvider theme={ theme }>
+                <Paper style={ { maxHeight: '90%', overflowY: 'auto' } }>
+                  <TableContainer component={ Paper }>
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell style={{ width: '50px' }}>ID</TableCell>
-                          <TableCell style={{ width: '150px' }}>Nome</TableCell>
-                          <TableCell style={{ width: '50px' }}>Idade</TableCell>
-                          <TableCell style={{ width: '250px' }}>Endereço</TableCell>
-                          <TableCell style={{ width: '150px' }}>CPF</TableCell>
-                          <TableCell style={{ width: '150px' }}>Valor Pago</TableCell>
-                          <TableCell style={{ width: '150px' }}>Nascimento</TableCell>
-                          <TableCell style={{ width: '100px' }}>Ações</TableCell>
+                          <TableCell style={ { width: '50px' } }>ID</TableCell>
+                          <TableCell style={ { width: '150px' } }>Nome</TableCell>
+                          <TableCell style={ { width: '50px' } }>Idade</TableCell>
+                          <TableCell style={ { width: '250px' } }>Endereço</TableCell>
+                          <TableCell style={ { width: '150px' } }>CPF</TableCell>
+                          <TableCell style={ { width: '150px' } }>Valor Pago</TableCell>
+                          <TableCell style={ { width: '150px' } }>Nascimento</TableCell>
+                          <TableCell style={ { width: '100px' } }>Ações</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {payments.map((payment) => (
-                          <TableRow key={payment.id}>
-                            <TableCell style={{ width: '50px' }}>{payment.id}</TableCell>
-                            <TableCell style={{ width: '150px' }}>{payment.name}</TableCell>
-                            <TableCell style={{ width: '50px' }}>{Number(payment.age)}</TableCell>
-                            <TableCell style={{ width: '250px' }}>{payment.address}</TableCell>
-                            <TableCell style={{ width: '150px' }}>{formatCpf(payment.cpf)}</TableCell>
-                            <TableCell style={{ width: '150px' }}>{formatAmount(payment.amountPaid)}</TableCell>
-                            <TableCell style={{ width: '150px' }}>{formatDate(payment.birthDate)}</TableCell>
-                            <TableCell style={{ width: '100px', display: 'flex' }}>
-                              <IconButton onClick={() => handleEdit(payment.id)}>
+                        { payments.map((payment) => (
+                          <TableRow key={ payment.id }>
+                            <TableCell style={ { width: '50px' } }>{ payment.id }</TableCell>
+                            <TableCell style={ { width: '150px' } }>{ payment.name }</TableCell>
+                            <TableCell style={ { width: '50px' } }>{ Number(payment.age) }</TableCell>
+                            <TableCell style={ { width: '250px' } }>{ payment.address }</TableCell>
+                            <TableCell style={ { width: '150px' } }>{ formatCpf(payment.cpf) }</TableCell>
+                            <TableCell style={ { width: '150px' } }>{ formatAmount(payment.amountPaid) }</TableCell>
+                            <TableCell style={ { width: '150px' } }>{ formatDate(payment.birthDate) }</TableCell>
+                            <TableCell style={ { width: '100px', display: 'flex' } }>
+                              <IconButton onClick={ () => handleEdit(payment.id) }>
                                 <Edit />
                               </IconButton>
-                              <IconButton onClick={() => handleDelete(payment.id)}>
+                              <IconButton onClick={ () => handleDelete(payment.id) }>
                                 <Delete />
                               </IconButton>
                             </TableCell>
                           </TableRow>
-                        ))}
+                        )) }
                       </TableBody>
                     </Table>
                   </TableContainer>
                   <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
+                    rowsPerPageOptions={ [ 5, 10, 25 ] }
                     component="div"
-                    count={total}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    count={ total }
+                    rowsPerPage={ rowsPerPage }
+                    page={ page }
+                    onPageChange={ handleChangePage }
+                    onRowsPerPageChange={ handleChangeRowsPerPage }
                   />
                 </Paper>
+              </ThemeProvider>
 
-                <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', gap: '20px', zIndex:0}}>
-                  <Button variant="contained" color="primary" onClick={fetchAllPayments}>
-                    Download CSV
+              <div style={ { marginTop: '20px', display: 'flex', justifyContent: 'space-between', gap: '20px', zIndex: 0 } }>
+                <Button variant="contained" color="primary" onClick={ fetchAllPayments }>
+                  Download CSV
+                </Button>
+                <label htmlFor="upload-csv">
+                  <Input
+                    id="upload-csv"
+                    type="file"
+                    inputProps={ { accept: ".csv" } }
+                    onChange={ handleFileUpload }
+                    style={ { display: 'none' } }
+                  />
+                  <Button variant="contained" color="primary" component="span">
+                    Upload CSV
                   </Button>
-                  <label htmlFor="upload-csv">
-                    <Input
-                      id="upload-csv"
-                      type="file"
-                      inputProps={{ accept: ".csv" }}
-                      onChange={handleFileUpload}
-                      style={{ display: 'none' }}
-                    />
-                    <Button variant="contained" color="primary" component="span">
-                      Upload CSV
-                    </Button>
-                  </label>
-                </div>
-              </>
-            )}
-      </main>
+                </label>
+              </div>
+            </>
+          ) }
+        </main>) }
+      { loading && !initialRender && (
+        <div className={ styles.loadingOverlay } style={ { display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 10, position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(255, 255, 255, 0.5)' } }>
+          <CircularProgress />
+        </div>
+      ) }
     </div>
   );
 }
