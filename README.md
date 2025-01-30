@@ -1,38 +1,46 @@
-# REST API
+# CobPayments
 
-This is an API project developed with NestJS and provides functionalities to manage users and payments.
+This is a full-stack project developed with NestJS for the backend and Next.js for the frontend. It provides functionalities to manage users and payments.
+
+## Architecture
+
+- **Backend:** NestJS (Modular monolithic)
+  - **Database:** PostgreSQL
+  - **ORM:** TypeORM
+  - **API Documentation:** Swagger
+  - **Testing:** Jest
+- **Frontend:** React.js
 
 ## Features
 
-- User authentication and authorization
-- User CRUD
 - Payment CRUD
 - API documentation with Swagger
+- Frontend interface to manage payments
 
 ## Functionalities
 
-### Users
-
-- Register new users (admin only)
-- User login (any user)
-- List all users (admin only)
-- Get user details by ID (authenticated user or admin)
-- Update user data (authenticated user or admin)
-- Delete a user (admin only)
-
 ### Payments
 
-- Register new payments (any user, no authentication required)
-- List all payments (admin only)
-- Get payment details by ID (admin only)
-- Update payment data (admin only)
-- Delete a payment (admin only)
+- Register new payments 
+- List all payments
+- List payments paginated 
+- Upload csv file with payments
+- Get payment details by ID
+- Update payment data 
+- Delete a payment 
 
 ## Routes
 
 The complete route documentation can be accessed via Swagger at `http://localhost:3001/api`.
 
-## Installation
+## Prerequisites
+
+- Docker
+- Docker Compose
+
+## Installation and Usage
+
+To run the project using Docker Compose, follow the steps below:
 
 1. Clone the repository:
    ```shell
@@ -40,94 +48,69 @@ The complete route documentation can be accessed via Swagger at `http://localhos
    cd cobpayments
    ```
 
-2. Install the dependencies:
-   ```shell
-   yarn install
-   ```
-
-3. Configure the environment variables:
+2. Configure the environment variables:
    Create a `.env` file at the root of the project and add the following variables:
    ```env
-   NODE_ENV=
-   PORT=
-   DOCKER_IMAGE_NAME=
-   ADMIN_API_KEY=
-   JWT_SECRET=
-   COMPANY_NAME=
-   DATABASE_TYPE=
-   DATABASE_HOST=
-   DATABASE_PORT=
-   DATABASE_USER=
-   DATABASE_PASSWORD=
-   DATABASE_NAME=
-   DATABASE_SCHEMA=
-   DATABASE_LOGGING=
-   DATABASE_SYNCHRONIZE=
+         NODE_ENV=development
+         PORT=3001
+         DOCKER_IMAGE_NAME=cobpayments
+         COMPANY_NAME=Cobuccio
+         DATABASE_HOST=localhost
+         DATABASE_PORT=5432
+         DATABASE_USER=postgres
+         DATABASE_PASSWORD=postgres
+         DATABASE_NAME=cobpayments_postgres
+         DATABASE_SCHEMA=public
+         DATABASE_LOGGING=true
+         DATABASE_SYNCHRONIZE=false
    ```
 
-4. Run the database migrations:
+3. Build the Docker images:
    ```shell
-   yarn migration:run
+   docker-compose build
    ```
 
-5. Run the initial:
+4. Run the containers:
    ```shell
-   yarn start:dev
+   docker-compose up
    ```
 
-## Usage
-
-1. Start the server:
+5. To stop the containers, use the command:
    ```shell
-   yarn start:dev
+   docker-compose down
    ```
 
-2. Build the project:
-   ```shell
-   yarn build
+6. Access the frontend in the browser:
+   ```
+   http://localhost:3000
    ```
 
-3. Access the API documentation in the browser:
+7. Access the API documentation in the browser:
    ```
    http://localhost:3001/api
    ```
 
-3. Use the API routes as described in the Routes section.
-
 ## Tests
 
-To run the tests, use the command:
-```shell
-yarn test
-```
+To run tests inside the container, use the following commands:
 
-## Docker
+### Backend
 
-To run the project using Docker, follow the steps below:
-
-1. Build the Docker image:
+1. Run tests:
    ```shell
-   make build
+   docker-compose exec app yarn test
    ```
 
-2. Run the container:
+2. Run the database migrations inside the container:
    ```shell
-   make up
+   docker-compose exec app yarn migration:run
    ```
 
-3. To stop the container, use the command:
-   ```shell
-   make down
-   ```
+### Frontend
 
-4. To run tests inside the container, use the command:
+1. Run tests:
    ```shell
-   make test
-   ```
-   
-5. To run the database migrations inside the container, use the command:
-   ```shell
-   make migration
+   docker-compose exec frontend yarn test
    ```
 
 ## Contribution
