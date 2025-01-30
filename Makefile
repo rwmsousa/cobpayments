@@ -17,7 +17,6 @@ logs:
 
 restart:
 	@if [ -n "$$(docker ps -q)" ]; then docker stop $$(docker ps -q); fi
-	docker-compose build
 	docker-compose up
 
 start:
@@ -30,7 +29,7 @@ start-prod:
 	yarn start:prod
 
 migration-generate:
-	yarn migration:generate $(name)
+	yarn migration:generate $(IMAGE_NAME)
 
 migration-run:
 	yarn migration:run
@@ -40,12 +39,6 @@ migration-revert:
 
 test:
 	yarn test
-
-test-watch:
-	yarn test:watch
-
-test-e2e:
-	yarn test:e2e
 
 lint:
 	yarn lint
