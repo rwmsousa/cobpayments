@@ -23,10 +23,17 @@ export default function Home() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [total, setTotal] = useState(0);
+  const [domLoaded, setDomLoaded] = useState(false);
 
   useEffect(() => {
-    fetchPayments(page, rowsPerPage);
-  }, [page, rowsPerPage]);
+    setDomLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (domLoaded) {
+      fetchPayments(page, rowsPerPage);
+    }
+  }, [page, rowsPerPage, domLoaded]);
 
   const fetchPayments = (page: number, rowsPerPage: number) => {
     setLoading(true);
@@ -205,60 +212,66 @@ export default function Home() {
       <main className={styles.main}>
         <h1>Lista de pagamentos</h1>
 
-        <Paper style={{ maxHeight: '90%', overflowY: 'auto' }}>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell style={{ width: '50px' }}>ID</TableCell>
-                  <TableCell style={{ width: '150px' }}>Nome</TableCell>
-                  <TableCell style={{ width: '50px' }}>Idade</TableCell>
-                  <TableCell style={{ width: '250px' }}>Endereço</TableCell>
-                  <TableCell style={{ width: '150px' }}>CPF</TableCell>
-                  <TableCell style={{ width: '150px' }}>Valor Pago</TableCell>
-                  <TableCell style={{ width: '150px' }}>Nascimento</TableCell>
-                  <TableCell style={{ width: '100px' }}>Ações</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {payments.map((payment) => (
-                  <TableRow key={payment.id}>
-                    <TableCell style={{ width: '50px' }}>{payment.id}</TableCell>
-                    <TableCell style={{ width: '150px' }}>{payment.name}</TableCell>
-                    <TableCell style={{ width: '50px' }}>{Number(payment.age)}</TableCell>
-                    <TableCell style={{ width: '250px' }}>{payment.address}</TableCell>
-                    <TableCell style={{ width: '150px' }}>{formatCpf(payment.cpf)}</TableCell>
-                    <TableCell style={{ width: '150px' }}>{formatAmount(payment.amountPaid)}</TableCell>
-                    <TableCell style={{ width: '150px' }}>{formatDate(payment.birthDate)}</TableCell>
-                    <TableCell style={{ width: '100px', display: 'flex' }}>
-                      <IconButton onClick={() => handleEdit(payment.id)}>
-                        <Edit />
-                      </IconButton>
-                      <IconButton onClick={() => handleDelete(payment.id)}>
-                        <Delete />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={total}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </Paper>
+        {domLoaded && payments.length === 0 ? (
+          <p>Nenhum pagamento encontrado.</p>
+        ) : (
+          <>
+            <Paper style={{ maxHeight: '90%', overflowY: 'auto' }}>
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell style={{ width: '50px' }}>ID</TableCell>
+                      <TableCell style={{ width: '150px' }}>Nome</TableCell>
+                      <TableCell style={{ width: '50px' }}>Idade</TableCell>
+                      <TableCell style={{ width: '250px' }}>Endereço</TableCell>
+                      <TableCell style={{ width: '150px' }}>CPF</TableCell>
+                      <TableCell style={{ width: '150px' }}>Valor Pago</TableCell>
+                      <TableCell style={{ width: '150px' }}>Nascimento</TableCell>
+                      <TableCell style={{ width: '100px' }}>Ações</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {payments.map((payment) => (
+                      <TableRow key={payment.id}>
+                        <TableCell style={{ width: '50px' }}>{payment.id}</TableCell>
+                        <TableCell style={{ width: '150px' }}>{payment.name}</TableCell>
+                        <TableCell style={{ width: '50px' }}>{Number(payment.age)}</TableCell>
+                        <TableCell style={{ width: '250px' }}>{payment.address}</TableCell>
+                        <TableCell style={{ width: '150px' }}>{formatCpf(payment.cpf)}</TableCell>
+                        <TableCell style={{ width: '150px' }}>{formatAmount(payment.amountPaid)}</TableCell>
+                        <TableCell style={{ width: '150px' }}>{formatDate(payment.birthDate)}</TableCell>
+                        <TableCell style={{ width: '100px', display: 'flex' }}>
+                          <IconButton onClick={() => handleEdit(payment.id)}>
+                            <Edit />
+                          </IconButton>
+                          <IconButton onClick={() => handleDelete(payment.id)}>
+                            <Delete />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={total}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </Paper>
 
-        <div style={{ marginTop: '20px' }}>
-          <Button variant="contained" color="primary" onClick={ fetchAllPayments }>
-            Download CSV
-          </Button>
-        </div>
+            <div style={{ marginTop: '20px' }}>
+              <Button variant="contained" color="primary" onClick={fetchAllPayments}>
+                Download CSV
+              </Button>
+            </div>
+          </>
+        )}
       </main>
     </div>
   );
