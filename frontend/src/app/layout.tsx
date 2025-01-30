@@ -7,12 +7,12 @@ import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  subsets: [ "latin" ],
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  subsets: [ "latin" ],
 });
 
 export default function RootLayout({
@@ -20,7 +20,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [ isHydrated, setIsHydrated ] = useState(false);
 
   useEffect(() => {
     try {
@@ -30,22 +30,14 @@ export default function RootLayout({
     }
   }, []);
 
-  if (!isHydrated) {
-    return (
-      <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable}`}>
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-            <CircularProgress />
-          </div>
-        </body>
-      </html>
-    );
-  }
 
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {typeof window !== 'undefined' && children}
+    <html lang="en" suppressHydrationWarning className="h-full">
+      <body className={ `${ geistSans.variable } ${ geistMono.variable }` }>
+        { typeof window !== 'undefined' && isHydrated ? children : (
+          <div style={ { display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" } }>
+            <CircularProgress />
+          </div>) }
       </body>
     </html>
   );
