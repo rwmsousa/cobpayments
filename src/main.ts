@@ -10,6 +10,11 @@ dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  if (typeof process.env.DATABASE_PASSWORD !== 'string') {
+    throw new Error('DATABASE_PASSWORD must be a string');
+  }
+
   await AppDataSource.initialize();
   await AppDataSource.runMigrations();
 
