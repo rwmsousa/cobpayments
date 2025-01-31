@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, IconButton, CircularProgress, ThemeProvider, Button, Input, createTheme } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, IconButton, CircularProgress, ThemeProvider, Button, Input, createTheme, Box } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import axios from "axios";
 import styles from "./page.module.css";
@@ -246,94 +246,100 @@ export default function Home() {
   return (
     <div className={ styles.page }>
       { loading && (
-        <div className={ styles.loadingOverlay } style={ { display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 10, position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh'} }>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 9999,
+          }}
+        >
           <CircularProgress />
-        </div>
+        </Box>
       ) }
-      { !loading && (
-        <main className={ styles.main }>
-          <h1 style={{fontSize:"2rem"}}>Lista de pagamentos</h1>
+      <main className={ styles.main }>
+        <h1 style={{fontSize:"2rem"}}>Lista de pagamentos</h1>
 
-          { total == 0 ? (
-            <p>Nenhum pagamento encontrado.</p>
-          ) : (
-            <>
-              <ThemeProvider theme={ theme }>
-                <Paper style={ { maxHeight: '90%', overflowY: 'auto' } }>
-                  <TableContainer component={ Paper }>
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell style={ { width: '50px' } }>ID</TableCell>
-                          <TableCell style={ { width: '150px' } }>Nome</TableCell>
-                          <TableCell style={ { width: '50px' } }>Idade</TableCell>
-                          <TableCell style={ { width: '250px' } }>Endereço</TableCell>
-                          <TableCell style={ { width: '150px' } }>CPF</TableCell>
-                          <TableCell style={ { width: '150px' } }>Valor Pago</TableCell>
-                          <TableCell style={ { width: '150px' } }>Nascimento</TableCell>
-                          <TableCell style={ { width: '100px' } }>Ações</TableCell>
+        { total == 0 ? (
+          <p>Nenhum pagamento encontrado.</p>
+        ) : (
+          <>
+            <ThemeProvider theme={ theme }>
+              <Paper style={ { maxHeight: '90%', overflowY: 'auto' } }>
+                <TableContainer component={ Paper }>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell style={ { width: '50px' } }>ID</TableCell>
+                        <TableCell style={ { width: '150px' } }>Nome</TableCell>
+                        <TableCell style={ { width: '50px' } }>Idade</TableCell>
+                        <TableCell style={ { width: '250px' } }>Endereço</TableCell>
+                        <TableCell style={ { width: '150px' } }>CPF</TableCell>
+                        <TableCell style={ { width: '150px' } }>Valor Pago</TableCell>
+                        <TableCell style={ { width: '150px' } }>Nascimento</TableCell>
+                        <TableCell style={ { width: '100px' } }>Ações</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      { payments.map((payment) => (
+                        <TableRow key={ payment.id }>
+                          <TableCell style={ { width: '50px' } }>{ payment.id }</TableCell>
+                          <TableCell style={ { width: '150px' } }>{ payment.name }</TableCell>
+                          <TableCell style={ { width: '50px' } }>{ Number(payment.age) }</TableCell>
+                          <TableCell style={ { width: '250px' } }>{ payment.address }</TableCell>
+                          <TableCell style={ { width: '150px' } }>{ formatCpf(payment.cpf) }</TableCell>
+                          <TableCell style={ { width: '150px' } }>{ formatAmount(payment.amountPaid) }</TableCell>
+                          <TableCell style={ { width: '150px' } }>{ formatDate(payment.birthDate) }</TableCell>
+                          <TableCell style={ { width: '100px', display: 'flex' } }>
+                            <IconButton onClick={ () => handleEdit(payment.id) }>
+                              <Edit />
+                            </IconButton>
+                            <IconButton onClick={ () => handleDelete(payment.id) }>
+                              <Delete />
+                            </IconButton>
+                          </TableCell>
                         </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        { payments.map((payment) => (
-                          <TableRow key={ payment.id }>
-                            <TableCell style={ { width: '50px' } }>{ payment.id }</TableCell>
-                            <TableCell style={ { width: '150px' } }>{ payment.name }</TableCell>
-                            <TableCell style={ { width: '50px' } }>{ Number(payment.age) }</TableCell>
-                            <TableCell style={ { width: '250px' } }>{ payment.address }</TableCell>
-                            <TableCell style={ { width: '150px' } }>{ formatCpf(payment.cpf) }</TableCell>
-                            <TableCell style={ { width: '150px' } }>{ formatAmount(payment.amountPaid) }</TableCell>
-                            <TableCell style={ { width: '150px' } }>{ formatDate(payment.birthDate) }</TableCell>
-                            <TableCell style={ { width: '100px', display: 'flex' } }>
-                              <IconButton onClick={ () => handleEdit(payment.id) }>
-                                <Edit />
-                              </IconButton>
-                              <IconButton onClick={ () => handleDelete(payment.id) }>
-                                <Delete />
-                              </IconButton>
-                            </TableCell>
-                          </TableRow>
-                        )) }
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                  <TablePagination
-                    rowsPerPageOptions={ [ 5, 10, 25 ] }
-                    component="div"
-                    count={ total }
-                    rowsPerPage={ rowsPerPage }
-                    page={ page }
-                    onPageChange={ handleChangePage }
-                    onRowsPerPageChange={ handleChangeRowsPerPage }
-                  />
+                      )) }
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                <TablePagination
+                  rowsPerPageOptions={ [ 5, 10, 25 ] }
+                  component="div"
+                  count={ total }
+                  rowsPerPage={ rowsPerPage }
+                  page={ page }
+                  onPageChange={ handleChangePage }
+                  onRowsPerPageChange={ handleChangeRowsPerPage }
+                />
 
-                </Paper>
-              </ThemeProvider>
+              </Paper>
+            </ThemeProvider>
 
 
-            </>
+          </>
 
-          ) }
-          <div style={ { marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '20px', zIndex: 0 } }>
-            { total> 0 && (
-              <Button variant="contained" color="primary" onClick={ fetchAllPayments }>
-                Download CSV
-              </Button>) }
-            <label htmlFor="upload-txt">
-              <Input
-                id="upload-txt"
-                type="file"
-                inputProps={ { accept: ".txt" } }
-                onChange={ handleFileUpload }
-                style={ { display: 'none' } }
-              />
-              <Button variant="contained" color="primary" component="span">
-                Upload TXT
-              </Button>
-            </label>
-          </div>
-        </main>) }
-
+        ) }
+        <div style={ { marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '20px', zIndex: 0 } }>
+          { total> 0 && (
+            <Button variant="contained" color="primary" onClick={ fetchAllPayments }>
+              Download CSV
+            </Button>) }
+          <label htmlFor="upload-txt">
+            <Input
+              id="upload-txt"
+              type="file"
+              inputProps={ { accept: ".txt" } }
+              onChange={ handleFileUpload }
+              style={ { display: 'none' } }
+            />
+            <Button variant="contained" color="primary" component="span">
+              Upload TXT
+            </Button>
+          </label>
+        </div>
+      </main>
     </div>
   );
 }
