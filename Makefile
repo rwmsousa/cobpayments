@@ -2,9 +2,12 @@ include .env
 IMAGE_NAME=$(DOCKER_IMAGE_NAME)
 
 build:
+	docker-compose build
+
+install:
 	sudo yarn install && sudo yarn build
 	cd frontend && sudo yarn install && sudo yarn build
-	docker build -t $(IMAGE_NAME) . --no-cache
+	docker-compose build
 
 up:
 	docker-compose up
