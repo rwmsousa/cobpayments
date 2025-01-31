@@ -37,10 +37,8 @@ export default function Home() {
   const [ page, setPage ] = useState(0);
   const [ rowsPerPage, setRowsPerPage ] = useState(10);
   const [ total, setTotal ] = useState(0);
-  const [ initialRender, setInitialRender ] = useState(true);
 
   useEffect(() => {
-    setInitialRender(false);
 
     fetchPayments(page, rowsPerPage);
     removeToast();
