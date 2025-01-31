@@ -40,7 +40,7 @@ The complete route documentation can be accessed via Swagger at `http://localhos
 
 ## Installation and Usage
 
-To run the project using Docker Compose, follow the steps below:
+To run the project using Docker Compose and Makefile, follow the steps below:
 
 1. Clone the repository:
    ```shell
@@ -67,17 +67,17 @@ To run the project using Docker Compose, follow the steps below:
 
 3. Build the Docker images:
    ```shell
-   docker-compose build
+   make build
    ```
 
 4. Run the containers:
    ```shell
-   docker-compose up
+   make up
    ```
 
 5. To stop the containers, use the command:
    ```shell
-   docker-compose down
+   make down
    ```
 
 6. Access the frontend in the browser:
@@ -98,20 +98,14 @@ To run tests inside the container, use the following commands:
 
 1. Run tests:
    ```shell
-   docker-compose exec app yarn test
+   make test
    ```
 
 2. Run the database migrations inside the container:
    ```shell
-   docker-compose exec app yarn migration:run
+   make migration-run
    ```
 
-### Frontend
-
-1. Run tests:
-   ```shell
-   docker-compose exec frontend yarn test
-   ```
 
 ## Contribution
 
@@ -144,3 +138,4 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
