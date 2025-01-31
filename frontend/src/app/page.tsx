@@ -40,11 +40,25 @@ export default function Home() {
   const [ initialRender, setInitialRender ] = useState(true);
 
   useEffect(() => {
-    // Este efeito é executado apenas no cliente após a hidratação.
-    setInitialRender(false); // Define como false após a primeira renderização no cliente.
+    setInitialRender(false);
 
-    fetchPayments(page, rowsPerPage); // Carrega os dados.
-  }, [ page, rowsPerPage ]); // Dependências atualizadas
+    fetchPayments(page, rowsPerPage);
+    removeToast();
+  }, [ page, rowsPerPage ]);
+
+  useEffect(() => {
+      removeToast();
+  }, [ loading ]);
+
+  const removeToast = () => {
+    const nextPortal = document.getElementsByTagName("nextjs-portal");
+    if (nextPortal) {
+      for (let i = 0; i < nextPortal.length; i++) {
+        console.log("Removendo toast:", nextPortal[i]);
+        nextPortal[i].remove();
+      }
+    }
+  };
 
   const fetchPayments = async (page: number, rowsPerPage: number) => {
     setLoading(true); // Define loading como true antes da requisição
@@ -238,7 +252,7 @@ export default function Home() {
       ) }
       { !loading && (
         <main className={ styles.main }>
-          <h1>Lista de pagamentos</h1>
+          <h1 style={{fontSize:"2rem"}}>Lista de pagamentos</h1>
 
           { total == 0 ? (
             <p>Nenhum pagamento encontrado.</p>
@@ -292,34 +306,34 @@ export default function Home() {
                     onPageChange={ handleChangePage }
                     onRowsPerPageChange={ handleChangeRowsPerPage }
                   />
+
                 </Paper>
               </ThemeProvider>
 
-              <div style={ { marginTop: '20px', display: 'flex', justifyContent: 'space-between', gap: '20px', zIndex: 0 } }>
-                <Button variant="contained" color="primary" onClick={ fetchAllPayments }>
-                  Download CSV
-                </Button>
-                <label htmlFor="upload-csv">
-                  <Input
-                    id="upload-csv"
-                    type="file"
-                    inputProps={ { accept: ".csv" } }
-                    onChange={ handleFileUpload }
-                    style={ { display: 'none' } }
-                  />
-                  <Button variant="contained" color="primary" component="span">
-                    Upload CSV
-                  </Button>
-                </label>
-              </div>
+
             </>
+
           ) }
+          <div style={ { marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '20px', zIndex: 0 } }>
+            { total> 0 && (
+              <Button variant="contained" color="primary" onClick={ fetchAllPayments }>
+                Download TXT
+              </Button>) }
+            <label htmlFor="upload-txt">
+              <Input
+                id="upload-txt"
+                type="file"
+                inputProps={ { accept: ".txt" } }
+                onChange={ handleFileUpload }
+                style={ { display: 'none' } }
+              />
+              <Button variant="contained" color="primary" component="span">
+                Upload CSV
+              </Button>
+            </label>
+          </div>
         </main>) }
-      { loading && !initialRender && (
-        <div className={ styles.loadingOverlay } style={ { display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 10, position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(255, 255, 255, 0.5)' } }>
-          <CircularProgress />
-        </div>
-      ) }
+
     </div>
   );
 }
