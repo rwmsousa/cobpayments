@@ -245,8 +245,8 @@ export default function Home() {
 
   return (
     <div className={ styles.page }>
-      { loading && initialRender && (
-        <div className={ styles.loadingOverlay } style={ { display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 10, position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(255, 255, 255, 0.5)' } }>
+      { loading && (
+        <div className={ styles.loadingOverlay } style={ { display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 10, position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh'} }>
           <CircularProgress />
         </div>
       ) }
@@ -317,7 +317,7 @@ export default function Home() {
           <div style={ { marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '20px', zIndex: 0 } }>
             { total> 0 && (
               <Button variant="contained" color="primary" onClick={ fetchAllPayments }>
-                Download TXT
+                Download CSV
               </Button>) }
             <label htmlFor="upload-txt">
               <Input
@@ -328,7 +328,7 @@ export default function Home() {
                 style={ { display: 'none' } }
               />
               <Button variant="contained" color="primary" component="span">
-                Upload CSV
+                Upload TXT
               </Button>
             </label>
           </div>
